@@ -9,16 +9,14 @@ from src.user import services as user_service
 from src.user.models import User
 
 
-async def register_user(
-    form: RegistrationForm, session: Session = Depends(get_session)
-):
+async def register_user(form: RegistrationForm, session: Session):
     """
     Register a new user
     """
-    user_password = hash_password(form.password.get_secret_value())
+    user_password = hash_password(form.password)
     new_user = user_service.create_user(
-        fname=form.fname,
-        lname=form.lname,
+        fname=form.first_name,
+        lname=form.last_name,
         password=user_password,
         email=form.email,
         doc_number=form.doc_number,
@@ -29,7 +27,8 @@ async def register_user(
         return Response(status_code=status.HTTP_201_CREATED, content="User created")
     except Exception as ex:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Username already exists"
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Username already exists. {ex}",
         ) from ex
 
 
@@ -38,8 +37,10 @@ def authenticate_user(user: User, password: str):
     Authenticate user and generate access token
     """
     if user and check_password(password, user.password):
-        token = AUTH.create_access_token(uid=str(user.email))
-        headers = {"Authorization": f"Bearer {token}"}
+        access_token = AUTH.create_access_token(
+            uid=str(user.id), data={"doc_number": user.doc_number, "email": user.email}
+        )
+        headers = {"Authorization": f"Bearer {access_token}"}
         return Response(
             status_code=status.HTTP_200_OK,
             headers=headers,

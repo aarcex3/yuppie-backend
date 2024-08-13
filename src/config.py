@@ -2,20 +2,16 @@
 App dependecies
 """
 
-import os
-
-from authx import AuthX, AuthXConfig
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """App settings"""
 
-    DB_URL: str = str(os.getenv("DB_URL"))
-    SECRET_KEY: str = str(os.getenv("SECRET_KEY", "secret"))
+    DB_URL: str
+    SECRET_KEY: str
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 SETTINGS = Settings()
-
-
-

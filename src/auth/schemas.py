@@ -1,36 +1,32 @@
-from pydantic import BaseModel, EmailStr, SecretStr, ValidationError, field_validator
+from pydantic import BaseModel, EmailStr, ValidationError, field_validator
 
 
 class RegistrationForm(BaseModel):
-    fname: str
-    lname: str
+    first_name: str
+    last_name: str
     email: EmailStr
-    doc_number: str
-    password: SecretStr
+    doc_number: int = 1_234_567
+    password: str
 
     @field_validator("doc_number")
     def validate_doc_number(cls, value):
-        if not value.isdigit():
-            raise ValidationError("doc_number must contain only digits")
-
-        doc_number_int = int(value)
-        if doc_number_int < 1000000:
-            raise ValidationError("doc_number must be greater than or equal to 1,000,000")
+        if value < 1000000:
+            raise ValidationError(
+                "doc_number must be greater than or equal to 1,000,000"
+            )
 
         return value
 
 
 class LoginForm(BaseModel):
-    doc_number: str
-    password: SecretStr
+    doc_number: int
+    password: str
 
     @field_validator("doc_number")
     def validate_doc_number(cls, value):
-        if not value.isdigit():
-            raise ValidationError("doc_number must contain only digits")
-
-        doc_number_int = int(value)
-        if doc_number_int < 1000000:
-            raise ValidationError("doc_number must be greater than or equal to 1,000,000")
+        if value < 1000000:
+            raise ValidationError(
+                "doc_number must be greater than or equal to 1,000,000"
+            )
 
         return value

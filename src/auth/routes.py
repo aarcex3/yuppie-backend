@@ -10,22 +10,26 @@ from sqlmodel import Session
 from src.auth import schemas
 from src.auth import services as auth_service
 from src.auth.dependecies import AUTH
+from src.database import get_session
 from src.user import services as user_service
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/register")
-async def register(form: schemas.RegistrationForm):
-    return await auth_service.register_user(form=form)
+async def register(
+    form: schemas.RegistrationForm, session: Session = Depends(get_session)
+):
+    return await auth_service.register_user(form=form, session=session)
 
 
 @router.post("/login")
 async def login(
     credentials: HTTPBasicCredentials = Depends(HTTPBasic()),
+    session: Session = Depends(get_session),
 ):
 
-    user = await user_service.find_user(credentials.username)
+    user = await user_service.find_user(credentials.username, session=session)
     return auth_service.authenticate_user(user, credentials.password)
 
 

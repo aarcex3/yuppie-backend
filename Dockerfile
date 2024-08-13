@@ -13,7 +13,7 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock ./
 
-RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without-dev --no-root
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install
 
 FROM python:3.9-slim-buster as runtime
 
@@ -22,6 +22,6 @@ ENV VIRTUAL_ENV=/app/.venv \
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
-COPY yuppie-backend ./yuppie-backend
+COPY . .
 
 ENTRYPOINT ["python", "-m", "src.main"]

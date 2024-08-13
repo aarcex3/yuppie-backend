@@ -1,26 +1,21 @@
-version: "3"
-
 services:
   fastapi_server:
     build: .
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/yuppie
+      - DB_URL=${DB_URL}
+      - SECRET_KEY=${SECRET_KEY}
     ports:
       - "8000:8000"
 
   db:
     image: postgres:15-alpine
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5433:5432"
+      - "6543:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=yuppie
-
-volumes:
-  postgres_data:
