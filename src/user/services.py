@@ -6,9 +6,6 @@ from src.user.models import User
 
 
 async def find_user(doc_number: int, session: Session) -> Union[User, None]:
-    """
-    Find the user for the given doc number
-    """
     user = session.exec(select(User).where(User.doc_number == doc_number)).one_or_none()
     return user
 
